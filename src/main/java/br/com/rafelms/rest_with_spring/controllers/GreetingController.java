@@ -1,6 +1,6 @@
 package br.com.rafelms.rest_with_spring.controllers;
 
-import br.com.rafelms.rest_with_spring.Greeting;
+import br.com.rafelms.rest_with_spring.model.Greeting;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
