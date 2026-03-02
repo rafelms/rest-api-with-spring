@@ -1,36 +1,23 @@
-package br.com.rafelms.rest_with_spring.model;
+package br.com.rafelms.rest_with_spring.data.dto.v1;
 
-import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.io.Serializable;
 import java.util.Objects;
 
-@Entity
-@Table(name="person")
 @Getter
 @Setter
-public class Person implements Serializable {
+public class PersonDTO implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @Column(name="firstName", nullable = false, length = 80)
     private String firstName;
-
-    @Column(name="lastName", nullable = false, length = 80)
     private String lastName;
-
-    @Column(nullable = false, length = 100)
     private String address;
-
-    @Column(nullable = false, length = 6)
     private String gender;
 
-    public Person(Long id, String firstName, String lastName, String address, String gender) {
+    public PersonDTO(Long id, String firstName, String lastName, String address, String gender) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -38,13 +25,14 @@ public class Person implements Serializable {
         this.gender = gender;
     }
 
-    public Person(){
+    public PersonDTO(){
 
     }
 
+
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof Person person)) return false;
+        if (!(o instanceof PersonDTO person)) return false;
         return Objects.equals(id, person.id) && Objects.equals(firstName, person.firstName) && Objects.equals(lastName, person.lastName) && Objects.equals(address, person.address) && Objects.equals(gender, person.gender);
     }
 

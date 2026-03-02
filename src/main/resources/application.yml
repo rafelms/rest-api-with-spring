@@ -1,1 +1,20 @@
-spring.application.name=rest-with-spring
+spring:
+  application:
+    name:
+      rest-with-spring
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/rest-with-spring?useTimezone=true&serverTimezone=UTC
+    username: root
+    password: novasenha
+  jpa:
+    hibernate:
+      ddl-auto: none
+    properties:
+        show_sql: false
+
+    open-in-view: false
+logging:
+  level:
+    root: warn
+    br.com.rafelms: DEBUG
