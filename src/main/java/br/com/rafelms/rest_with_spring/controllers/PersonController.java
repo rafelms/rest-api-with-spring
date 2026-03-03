@@ -8,6 +8,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -18,30 +19,38 @@ public class PersonController {
     private PersonServices service;
 
     @GetMapping(value = "/{id}",
-                    produces = MediaType.APPLICATION_JSON_VALUE)
+                produces = {MediaType.APPLICATION_JSON_VALUE,
+                            MediaType.APPLICATION_XML_VALUE})
     public PersonDTO findById(@PathVariable Long id){
         return service.findById(id);
     }
 
-    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)/*Não preciso passar o path {id}, pois o default vai ser All*/
+    @GetMapping(produces = {MediaType.APPLICATION_JSON_VALUE,
+                            MediaType.APPLICATION_XML_VALUE})/*Não preciso passar o path {id}, pois o default vai ser All*/
     public List<PersonDTO> findAll(){
         return service.findAll();
     }
 
-    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE,
-                    consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(produces = {MediaType.APPLICATION_JSON_VALUE,
+                MediaType.APPLICATION_XML_VALUE},
+                    consumes = {MediaType.APPLICATION_JSON_VALUE,
+                                MediaType.APPLICATION_XML_VALUE})
     public PersonDTO create(@RequestBody PersonDTO person){
         return service.create(person);
     }
 
-    @PutMapping(produces = MediaType.APPLICATION_JSON_VALUE,
-            consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(produces = {MediaType.APPLICATION_JSON_VALUE,
+                            MediaType.APPLICATION_XML_VALUE},
+            consumes = {MediaType.APPLICATION_JSON_VALUE,
+                        MediaType.APPLICATION_XML_VALUE})
     public PersonDTO update(@RequestBody PersonDTO person){return service.update(person);}
 
-    @DeleteMapping(value = "/{id}")
+    @DeleteMapping(value = "/{id}",
+                    produces = {MediaType.APPLICATION_JSON_VALUE,
+                                MediaType.APPLICATION_XML_VALUE})
     public ResponseEntity<?> delete(@PathVariable Long id) {
         service.delete(id);
-        return ResponseEntity.noContent().build(); // Retorno do 204
+        return ResponseEntity.ok("Usuário deletado com sucesso!"); // Retorno do 204
     }
 
 //    @PostMapping(value = "/v2",

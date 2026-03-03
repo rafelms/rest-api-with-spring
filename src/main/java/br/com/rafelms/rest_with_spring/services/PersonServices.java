@@ -8,6 +8,7 @@ import static br.com.rafelms.rest_with_spring.mapper.ObjectMapper.parseObject;
 //import br.com.rafelms.rest_with_spring.mapper.custom.PersonMapper;
 import br.com.rafelms.rest_with_spring.model.Person;
 import br.com.rafelms.rest_with_spring.repository.PersonRepository;
+import br.com.rafelms.rest_with_spring.validations.PersonValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +26,9 @@ public class PersonServices {
 
     @Autowired
     PersonRepository repository;
+
+    @Autowired
+    PersonValidator validator;
 
     /**Usado para versionamento de API(estudo)*/
 //    @Autowired
@@ -44,10 +48,16 @@ public class PersonServices {
 
     public PersonDTO create(PersonDTO person){
         logger.info("Creating one Person!");
+        validator.validatePerson(person);
+
         var entity = parseObject(person, Person.class);
+
         return parseObject(repository.save(entity), PersonDTO.class);
     }
-/**Usado para versionamento de API(estudo)*/
+
+
+
+    /**Usado para versionamento de API(estudo)*/
 //    public PersonDTOV2 createV2(PersonDTOV2 person){
 //        logger.info("Creating one Person V2!");
 //        var entity = converter.convertDTOToEntity(person);
@@ -56,6 +66,8 @@ public class PersonServices {
 
     public PersonDTO update(PersonDTO person){
         logger.info("Updating one Person!");
+
+        validator.validatePerson(person);
 
         Person entity = repository.findById(person.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("No records found for this ID"));
@@ -68,12 +80,14 @@ public class PersonServices {
         return parseObject(repository.save(entity), PersonDTO.class);
     }
 
-    public void delete(Long id){
+    public String delete(Long id) {
         logger.info("Deleting one Person!");
 
         Person entity = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("No records found for this ID"));
 
         repository.delete(entity);
+
+        return "Usuário apagado com sucesso";
     }
 }
