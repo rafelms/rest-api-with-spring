@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.springframework.hateoas.RepresentationModel;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -13,7 +14,7 @@ import java.util.Date;
 //@JsonPropertyOrder({"id", "first_name", "last_name", "gender", "address"}) //Definição da ordem dos atributos no JSON
 @Data
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-public class PersonDTO implements Serializable {
+public class PersonDTO extends RepresentationModel<PersonDTO> implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @EqualsAndHashCode.Include
@@ -25,10 +26,8 @@ public class PersonDTO implements Serializable {
 //    @JsonProperty("last_name")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String lastName;
-    private String phoneNumber;
 
     @JsonFormat(pattern = "dd/MM/yyyy")
-    private Date birthDay;
     private String address;
 
     //@JsonIgnore // Suprimir algum atributo
