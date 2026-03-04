@@ -3,6 +3,7 @@ package br.com.rafelms.rest_with_spring.services;
 import br.com.rafelms.rest_with_spring.controllers.PersonController;
 import br.com.rafelms.rest_with_spring.data.dto.v1.PersonDTO;
 //import br.com.rafelms.rest_with_spring.data.dto.v2.PersonDTOV2;
+import br.com.rafelms.rest_with_spring.exception.RequiredObjectIsNullException;
 import br.com.rafelms.rest_with_spring.exception.ResourceNotFoundException;
 import static br.com.rafelms.rest_with_spring.mapper.ObjectMapper.parseObject;
 
@@ -17,14 +18,12 @@ import org.springframework.stereotype.Service;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 
 import java.util.List;
-import java.util.concurrent.atomic.AtomicLong;
 
 import static br.com.rafelms.rest_with_spring.mapper.ObjectMapper.parseListObjects;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @Service // disponibiliza a classe e deixa injetavel
 public class PersonServices {
-    private final AtomicLong counter = new AtomicLong();
     private Logger logger = LoggerFactory.getLogger(PersonServices.class.getName()); // adicionando logger
 
     @Autowired
@@ -37,6 +36,15 @@ public class PersonServices {
 //    @Autowired
 //    PersonMapper converter;
 
+    public PersonDTO findById(Long id){
+        logger.info("Finding one Person!");
+        var entity = repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("No records found for this ID"));
+        var dto = parseObject(entity, PersonDTO.class);
+        addHateoasLinks(dto);
+        return dto;
+    }
+
     public List<PersonDTO> findAll(){
         logger.info("Finding one Person!");
         var persons =  parseListObjects(repository.findAll(), PersonDTO.class);
@@ -44,16 +52,10 @@ public class PersonServices {
         return persons;
     }
 
-    public PersonDTO findById(Long id){
-        logger.info("Finding one Person!");
-        var entity = repository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("No records found for this ID"));
-       var dto = parseObject(entity, PersonDTO.class);
-        addHateoasLinks(dto);
-        return dto;
-    }
 
     public PersonDTO create(PersonDTO person){
+        if(person == null) throw new RequiredObjectIsNullException();
+
         logger.info("Creating one Person!");
 
         validator.validatePerson(person);
@@ -79,6 +81,8 @@ public class PersonServices {
 
 
     public PersonDTO update(PersonDTO person){
+        if(person == null) throw new RequiredObjectIsNullException();
+
         logger.info("Updating one Person!");
 
         validator.validatePerson(person);
