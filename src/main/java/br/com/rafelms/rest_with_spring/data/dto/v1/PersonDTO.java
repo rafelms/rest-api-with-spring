@@ -9,11 +9,11 @@ import org.springframework.hateoas.RepresentationModel;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Objects;
 
 
 //@JsonPropertyOrder({"id", "first_name", "last_name", "gender", "address"}) //Definição da ordem dos atributos no JSON
 @Data
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class PersonDTO extends RepresentationModel<PersonDTO> implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -43,5 +43,17 @@ public class PersonDTO extends RepresentationModel<PersonDTO> implements Seriali
 
     public PersonDTO(){
 
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof PersonDTO personDTO)) return false;
+        if (!super.equals(o)) return false;
+        return Objects.equals(id, personDTO.id) && Objects.equals(firstName, personDTO.firstName) && Objects.equals(lastName, personDTO.lastName) && Objects.equals(address, personDTO.address) && Objects.equals(gender, personDTO.gender);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), id, firstName, lastName, address, gender);
     }
 }

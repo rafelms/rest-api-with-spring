@@ -69,14 +69,13 @@ public class PersonServices {
 
 
 
-    public String delete(Long id) {
+    public void delete(Long id) {
         logger.info("Deleting one Person!");
 
         Person entity = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("No records found for this ID"));
 
         repository.delete(entity);
-        return "Usuário apagado com sucesso";
     }
 
 

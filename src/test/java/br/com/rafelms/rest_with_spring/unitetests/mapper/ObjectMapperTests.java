@@ -8,22 +8,28 @@ import java.util.List;
 
 import br.com.rafelms.rest_with_spring.data.dto.v1.PersonDTO;
 import br.com.rafelms.rest_with_spring.model.Person;
+import br.com.rafelms.rest_with_spring.unitetests.mapper.mocks.MockBooks;
 import br.com.rafelms.rest_with_spring.unitetests.mapper.mocks.MockPerson;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 
 public class ObjectMapperTests {
-    MockPerson inputObject;
+    MockPerson inputPerson;
+    MockBooks inputBooks;
+
 
     @BeforeEach
     public void setUp() {
-        inputObject = new MockPerson();
+        inputPerson = new MockPerson();
+        inputBooks = new MockBooks();
     }
+
+
 
     @Test
     public void parseEntityToDTOTest() {
-        PersonDTO output = parseObject(inputObject.mockEntity(), PersonDTO.class);
+        PersonDTO output = parseObject(inputPerson.mockEntity(), PersonDTO.class);
         assertEquals(Long.valueOf(0L), output.getId());
         assertEquals("First Name Test0", output.getFirstName());
         assertEquals("Last Name Test0", output.getLastName());
@@ -33,7 +39,7 @@ public class ObjectMapperTests {
 
     @Test
     public void parseEntityListToDTOListTest() {
-        List<PersonDTO> outputList = parseListObjects(inputObject.mockEntityList(), PersonDTO.class);
+        List<PersonDTO> outputList = parseListObjects(inputPerson.mockEntityList(), PersonDTO.class);
         PersonDTO outputZero = outputList.get(0);
 
         assertEquals(Long.valueOf(0L), outputZero.getId());
@@ -61,7 +67,7 @@ public class ObjectMapperTests {
 
     @Test
     public void parseDTOToEntityTest() {
-        Person output = parseObject(inputObject.mockDTO(), Person.class);
+        Person output = parseObject(inputPerson.mockDTO(), Person.class);
         assertEquals(Long.valueOf(0L), output.getId());
         assertEquals("First Name Test0", output.getFirstName());
         assertEquals("Last Name Test0", output.getLastName());
@@ -71,7 +77,7 @@ public class ObjectMapperTests {
 
     @Test
     public void parserDTOListToEntityListTest() {
-        List<Person> outputList = parseListObjects(inputObject.mockDTOList(), Person.class);
+        List<Person> outputList = parseListObjects(inputPerson.mockDTOList(), Person.class);
         Person outputZero = outputList.get(0);
 
         assertEquals(Long.valueOf(0L), outputZero.getId());
