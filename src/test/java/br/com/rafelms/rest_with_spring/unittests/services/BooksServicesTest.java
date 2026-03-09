@@ -1,10 +1,12 @@
-package br.com.rafelms.rest_with_spring.services;
+package br.com.rafelms.rest_with_spring.unittests.services;
 
 import br.com.rafelms.rest_with_spring.data.dto.v1.BooksDTO;
 import br.com.rafelms.rest_with_spring.exception.RequiredObjectIsNullException;
 import br.com.rafelms.rest_with_spring.model.Books;
 import br.com.rafelms.rest_with_spring.repository.BooksRepository;
-import br.com.rafelms.rest_with_spring.unitetests.mapper.mocks.MockBooks;
+import br.com.rafelms.rest_with_spring.services.BooksServices;
+import br.com.rafelms.rest_with_spring.unittests.mapper.mocks.MockBooks;
+import br.com.rafelms.rest_with_spring.validations.BooksValidator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -28,6 +30,9 @@ class BooksServicesTest {
 
     @Mock
     BooksRepository repository;
+
+    @Mock
+    private BooksValidator validator;
 
 
     @InjectMocks

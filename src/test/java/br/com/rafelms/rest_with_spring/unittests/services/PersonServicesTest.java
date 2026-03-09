@@ -1,10 +1,11 @@
-package br.com.rafelms.rest_with_spring.services;
+package br.com.rafelms.rest_with_spring.unittests.services;
 
 import br.com.rafelms.rest_with_spring.data.dto.v1.PersonDTO;
 import br.com.rafelms.rest_with_spring.exception.RequiredObjectIsNullException;
 import br.com.rafelms.rest_with_spring.model.Person;
 import br.com.rafelms.rest_with_spring.repository.PersonRepository;
-import br.com.rafelms.rest_with_spring.unitetests.mapper.mocks.MockPerson;
+import br.com.rafelms.rest_with_spring.services.PersonServices;
+import br.com.rafelms.rest_with_spring.unittests.mapper.mocks.MockPerson;
 import br.com.rafelms.rest_with_spring.validations.PersonValidator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

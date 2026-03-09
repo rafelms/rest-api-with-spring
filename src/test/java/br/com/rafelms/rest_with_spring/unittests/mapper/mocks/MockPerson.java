@@ -1,4 +1,4 @@
-package br.com.rafelms.rest_with_spring.unitetests.mapper.mocks;
+package br.com.rafelms.rest_with_spring.unittests.mapper.mocks;
 
 import br.com.rafelms.rest_with_spring.data.dto.v1.PersonDTO;
 import br.com.rafelms.rest_with_spring.model.Person;

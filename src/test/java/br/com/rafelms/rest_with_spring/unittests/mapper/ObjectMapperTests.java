@@ -1,4 +1,4 @@
-package br.com.rafelms.rest_with_spring.unitetests.mapper;
+package br.com.rafelms.rest_with_spring.unittests.mapper;
 
 import static br.com.rafelms.rest_with_spring.mapper.ObjectMapper.parseListObjects;
 import static br.com.rafelms.rest_with_spring.mapper.ObjectMapper.parseObject;
@@ -8,8 +8,8 @@ import java.util.List;
 
 import br.com.rafelms.rest_with_spring.data.dto.v1.PersonDTO;
 import br.com.rafelms.rest_with_spring.model.Person;
-import br.com.rafelms.rest_with_spring.unitetests.mapper.mocks.MockBooks;
-import br.com.rafelms.rest_with_spring.unitetests.mapper.mocks.MockPerson;
+import br.com.rafelms.rest_with_spring.unittests.mapper.mocks.MockBooks;
+import br.com.rafelms.rest_with_spring.unittests.mapper.mocks.MockPerson;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
