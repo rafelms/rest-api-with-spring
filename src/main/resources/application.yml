@@ -8,7 +8,7 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/rest-with-spring?createDatabaseIfNotExist=true&useTimezone=true&serverTimezone=UTC
     username: root
-    password: 123456
+    password: novasenha
   jpa:
     hibernate:
       ddl-auto: validate
