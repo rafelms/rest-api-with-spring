@@ -5,11 +5,14 @@ import br.com.rafelms.rest_with_spring.data.dto.v1.BooksDTO;
 import br.com.rafelms.rest_with_spring.services.BooksServices;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("api/books/v1")
@@ -30,8 +33,14 @@ public class BooksController implements BooksControllerDocs {
     @GetMapping(produces = {
             MediaType.APPLICATION_JSON_VALUE,
             MediaType.APPLICATION_XML_VALUE})
-    public List<BooksDTO> findAll(){
-        return service.findAll();
+    @Override
+    public ResponseEntity<PagedModel<EntityModel<BooksDTO>>> findAll(
+            @RequestParam(value = "page", defaultValue = "0") Integer page,
+            @RequestParam(value = "size", defaultValue = "5") Integer size,
+            @RequestParam(value = "direction", defaultValue = "asc") String direction){
+        Sort sortDirection = "desc".equalsIgnoreCase(direction) ? Sort.by("title").descending() : Sort.by("title").ascending();
+        Pageable pageable = PageRequest.of(page, size, sortDirection);
+        return ResponseEntity.ok(service.findAll(pageable));
     }
 
     @PostMapping(

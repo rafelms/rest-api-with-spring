@@ -2,18 +2,18 @@ package br.com.rafelms.rest_with_spring.data.dto.v1;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.hateoas.RepresentationModel;
+import org.springframework.hateoas.server.core.Relation;
 
 import java.io.Serializable;
-import java.util.Date;
 import java.util.Objects;
 
 
 //@JsonPropertyOrder({"id", "first_name", "last_name", "gender", "address"}) //Definição da ordem dos atributos no JSON
 @Data
+@Relation(collectionRelation = "people")
 public class PersonDTO extends RepresentationModel<PersonDTO> implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -33,12 +33,15 @@ public class PersonDTO extends RepresentationModel<PersonDTO> implements Seriali
     //@JsonIgnore // Suprimir algum atributo
     private String gender;
 
+    private Boolean enabled;
+
     public PersonDTO(Long id, String firstName, String lastName, String address, String gender) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
         this.address = address;
         this.gender = gender;
+        this.enabled = enabled;
     }
 
     public PersonDTO(){
@@ -49,11 +52,11 @@ public class PersonDTO extends RepresentationModel<PersonDTO> implements Seriali
     public boolean equals(Object o) {
         if (!(o instanceof PersonDTO personDTO)) return false;
         if (!super.equals(o)) return false;
-        return Objects.equals(id, personDTO.id) && Objects.equals(firstName, personDTO.firstName) && Objects.equals(lastName, personDTO.lastName) && Objects.equals(address, personDTO.address) && Objects.equals(gender, personDTO.gender);
+        return Objects.equals(id, personDTO.id) && Objects.equals(firstName, personDTO.firstName) && Objects.equals(lastName, personDTO.lastName) && Objects.equals(address, personDTO.address) && Objects.equals(gender, personDTO.gender) && Objects.equals(enabled, personDTO.enabled);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), id, firstName, lastName, address, gender);
+        return Objects.hash(super.hashCode(), id, firstName, lastName, address, gender, enabled);
     }
 }

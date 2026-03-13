@@ -3,12 +3,14 @@ package br.com.rafelms.rest_with_spring.data.dto.v1;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.hateoas.RepresentationModel;
+import org.springframework.hateoas.server.core.Relation;
 
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Objects;
 
 @Data
+@Relation(collectionRelation = "books")
 public class BooksDTO extends RepresentationModel<BooksDTO> implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;

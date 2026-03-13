@@ -2,6 +2,9 @@ server:
   port: 8888
 cors:
   originPatterns: http://localhost:8080,http://localhost:3000,https://rafaelms.com.br
+email:
+  subject: "Default subject"
+  message: "Default message"
 spring:
   jpa:
     hibernate:
@@ -10,6 +13,15 @@ spring:
       hibernate:
         show_sql: false
     open-in-view: false
+mail:
+  host: smtp.gmail.com
+  port: 587
+  username: ${EMAIL_USERNAME}
+  password: ${EMAIL_PASSWORD}
+  properties:
+    mail.smtp.auth: true
+    mail.smtp.starttls.enabled: true
+    mail.smtp.starttls.required: true
 
   flyway:
     baseline-on-migrate: true

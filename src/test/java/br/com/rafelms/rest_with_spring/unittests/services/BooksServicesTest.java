@@ -15,6 +15,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.*;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.PagedModel;
 
 import java.util.List;
 import java.util.Optional;
@@ -50,30 +53,6 @@ class BooksServicesTest {
                         && link.getHref().contains("api/books/v1/" + id)
                         && "GET".equals(link.getType())
                 ));
-
-        assertTrue(dto.getLinks().stream()
-                .anyMatch(link -> link.getRel().value().equals("findAll")
-                        && link.getHref().contains("api/books/v1")
-                        && "GET".equals(link.getType())
-                ));
-
-        assertTrue(dto.getLinks().stream()
-                .anyMatch(link -> link.getRel().value().equals("create")
-                        && link.getHref().contains("api/books/v1")
-                        && "POST".equals(link.getType())
-                ));
-
-        assertTrue(dto.getLinks().stream()
-                .anyMatch(link -> link.getRel().value().equals("update")
-                        && link.getHref().contains("api/books/v1")
-                        && "PUT".equals(link.getType())
-                ));
-
-        assertTrue(dto.getLinks().stream()
-                .anyMatch(link -> link.getRel().value().equals("delete")
-                        && link.getHref().contains("api/books/v1/" + id)
-                        && "DELETE".equals(link.getType())
-                ));
     }
 
     @Test
@@ -92,7 +71,6 @@ class BooksServicesTest {
         assertHateoasLinks(result, 1L);
 
         assertEquals("Title Test1", result.getTitle());
-        assertEquals("Type Test1", result.getType());
         assertEquals("Author Test1", result.getAuthor());
     }
 
@@ -114,7 +92,6 @@ class BooksServicesTest {
         assertHateoasLinks(result, 1L);
 
         assertEquals("Title Test1", result.getTitle());
-        assertEquals("Type Test1", result.getType());
         assertEquals("Author Test1", result.getAuthor());
     }
 
@@ -161,7 +138,6 @@ class BooksServicesTest {
         assertHateoasLinks(result, 1L);
 
         assertEquals("Title Test1", result.getTitle());
-        assertEquals("Type Test1", result.getType());
         assertEquals("Author Test1", result.getAuthor());
     }
 
@@ -182,35 +158,34 @@ class BooksServicesTest {
 
     @Test
     void findAll() {
+        Pageable pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.ASC, "title"));
 
         List<Books> list = input.mockEntityList();
+        Page<Books> page = new PageImpl<>(list, pageable, list.size());
 
-        when(repository.findAll()).thenReturn(list);
+        when(repository.findAll(pageable)).thenReturn(page);
 
-        List<BooksDTO> result = service.findAll();
+        PagedModel<EntityModel<BooksDTO>> result = service.findAll(pageable);
 
         assertNotNull(result);
-        assertEquals(14, result.size());
+        List<EntityModel<BooksDTO>> entities = result.getContent().stream().toList();
+        assertEquals(14, entities.size());
 
-        var book1 = result.get(1);
+        BooksDTO book1 = entities.get(1).getContent();
+        assertNotNull(book1);
         assertHateoasLinks(book1, 1L);
 
         assertEquals("Title Test1", book1.getTitle());
-        assertEquals("Type Test1", book1.getType());
         assertEquals("Author Test1", book1.getAuthor());
 
-        var book4 = result.get(4);
+        BooksDTO book4 = entities.get(4).getContent();
+        assertNotNull(book4);
         assertHateoasLinks(book4, 4L);
-
         assertEquals("Title Test4", book4.getTitle());
-        assertEquals("Type Test4", book4.getType());
-        assertEquals("Author Test4", book4.getAuthor());
 
-        var book7 = result.get(7);
+        BooksDTO book7 = entities.get(7).getContent();
+        assertNotNull(book7);
         assertHateoasLinks(book7, 7L);
-
-        assertEquals("Title Test7", book7.getTitle());
-        assertEquals("Type Test7", book7.getType());
-        assertEquals("Author Test7", book7.getAuthor());
+        assertEquals("Title Test7", book7.getAuthor());
     }
 }

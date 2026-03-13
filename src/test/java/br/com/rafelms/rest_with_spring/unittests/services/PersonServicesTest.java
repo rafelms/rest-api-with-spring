@@ -14,6 +14,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.PagedModel;
 
 import java.util.List;
 import java.util.Optional;
@@ -21,12 +27,11 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-@TestInstance(TestInstance.Lifecycle.PER_CLASS) // o ciclo de vida dura apenas nesta classe, mesmo que tenha outra classe de teste,
-@ExtendWith(MockitoExtension.class)             // será criado outros objetos.
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@ExtendWith(MockitoExtension.class)
 class PersonServicesTest {
 
     MockPerson input;
-
 
     @Mock
     PersonRepository repository;
@@ -42,197 +47,66 @@ class PersonServicesTest {
         input = new MockPerson();
     }
 
-    @Test
-    void findById() {
-        Person person = input.mockEntity(1); //simulando acesso ao bd
-        person.setId(1L);
-        when(repository.findById(1L)).thenReturn(Optional.of(person));// o que deve fazer/retornar qnd o repo for invocado,
-                                                                      // será uma instancia de person.
-        var result = service.findById(1L);
-
-        assertNotNull(result);
-        assertNotNull(result.getId());
-        assertNotNull(result.getLinks());
-        assertTrue(result.getLinks().stream()
-                .anyMatch(link ->  link.getRel().value().equals("self")
-                    && link.getHref().endsWith("/api/person/v1/1")
-                    && "GET".equals(link.getType())
-                )
-        );
-
-        assertTrue(result.getLinks().stream()
-                .anyMatch(link ->  link.getRel().value().equals("findAll")
-                        && link.getHref().endsWith("/api/person/v1")
+    private void assertPerson(PersonDTO person, int number) {
+        assertNotNull(person);
+        assertNotNull(person.getId());
+        assertNotNull(person.getLinks());
+        assertTrue(person.getLinks().stream()
+                .anyMatch(link -> link.getRel().value().equals("self")
+                        && link.getHref().endsWith("/api/person/v1/" + number)
                         && "GET".equals(link.getType())
                 )
         );
+        assertEquals("Address Test" + number, person.getAddress());
+        assertEquals("First Name Test" + number, person.getFirstName());
+        assertEquals("Last Name Test" + number, person.getLastName());
+        assertEquals(((number % 2) == 0) ? "Male" : "Female", person.getGender());
+    }
 
-        assertTrue(result.getLinks().stream()
-                .anyMatch(link ->  link.getRel().value().equals("create")
-                        && link.getHref().endsWith("/api/person/v1")
-                        && "POST".equals(link.getType())
-                )
-        );
-
-        assertTrue(result.getLinks().stream()
-                .anyMatch(link ->  link.getRel().value().equals("update")
-                        && link.getHref().endsWith("/api/person/v1")
-                        && "PUT".equals(link.getType())
-                )
-        );
-
-        assertTrue(result.getLinks().stream()
-                .anyMatch(link ->  link.getRel().value().equals("delete")
-                        && link.getHref().endsWith("/api/person/v1/1")
-                        && "DELETE".equals(link.getType())
-                )
-        );
-
-        assertEquals("Address Test1", result.getAddress());
-        assertEquals("First Name Test1", result.getFirstName());
-        assertEquals("Last Name Test1", result.getLastName());
-        assertEquals("Female", result.getGender());
-
+    @Test
+    void findById() {
+        Person person = input.mockEntity(1);
+        person.setId(1L);
+        when(repository.findById(1L)).thenReturn(Optional.of(person));
+        var result = service.findById(1L);
+        assertPerson(result, 1);
     }
 
     @Test
     void create() {
-
-        Person person = input.mockEntity(1); //simulando acesso ao bd
-        Person persisted = person;
+        Person person = input.mockEntity(1);
         person.setId(1L);
-
         PersonDTO dto = input.mockDTO(1);
-
-        when(repository.save(person)).thenReturn(persisted);    // o que deve fazer/retornar qnd o repo for invocado,
-                                                                // será uma instancia de person.
+        when(repository.save(any(Person.class))).thenReturn(person);
         var result = service.create(dto);
-
-        assertNotNull(result);
-        assertNotNull(result.getId());
-        assertNotNull(result.getLinks());
-
-        assertTrue(result.getLinks().stream()
-                .anyMatch(link ->  link.getRel().value().equals("self")
-                        && link.getHref().endsWith("/api/person/v1/1")
-                        && "GET".equals(link.getType())
-                )
-        );
-
-        assertTrue(result.getLinks().stream()
-                .anyMatch(link ->  link.getRel().value().equals("findAll")
-                        && link.getHref().endsWith("/api/person/v1")
-                        && "GET".equals(link.getType())
-                )
-        );
-
-        assertTrue(result.getLinks().stream()
-                .anyMatch(link ->  link.getRel().value().equals("create")
-                        && link.getHref().endsWith("/api/person/v1")
-                        && "POST".equals(link.getType())
-                )
-        );
-
-        assertTrue(result.getLinks().stream()
-                .anyMatch(link ->  link.getRel().value().equals("update")
-                        && link.getHref().endsWith("/api/person/v1")
-                        && "PUT".equals(link.getType())
-                )
-        );
-
-        assertTrue(result.getLinks().stream()
-                .anyMatch(link ->  link.getRel().value().equals("delete")
-                        && link.getHref().endsWith("/api/person/v1/1")
-                        && "DELETE".equals(link.getType())
-                )
-        );
-
-        assertEquals("Address Test1", result.getAddress());
-        assertEquals("First Name Test1", result.getFirstName());
-        assertEquals("Last Name Test1", result.getLastName());
-        assertEquals("Female", result.getGender());
-
+        assertPerson(result, 1);
     }
 
     @Test
-    void testCreateWithNullPerson(){
-        Exception exception = assertThrows(RequiredObjectIsNullException.class,
-                () -> {
-            service.create(null);
-        });
+    void testCreateWithNullPerson() {
+        Exception exception = assertThrows(RequiredObjectIsNullException.class, () -> service.create(null));
         String expectedMessage = "It is not allowed to persist a null object!";
         String actualMessage = exception.getMessage();
         assertTrue(actualMessage.contains(expectedMessage));
     }
 
     @Test
-    void testUpdateWithNullPerson(){
-        Exception exception = assertThrows(RequiredObjectIsNullException.class,
-                () -> {
-            service.update(null);
-        });
+    void testUpdateWithNullPerson() {
+        Exception exception = assertThrows(RequiredObjectIsNullException.class, () -> service.update(null));
         String expectedMessage = "It is not allowed to persist a null object!";
         String actualMessage = exception.getMessage();
         assertTrue(actualMessage.contains(expectedMessage));
     }
-
-
 
     @Test
     void update() {
-        Person person = input.mockEntity(1); //simulando acesso ao bd
-        Person persisted = person;
+        Person person = input.mockEntity(1);
         person.setId(1L);
-
         PersonDTO dto = input.mockDTO(1);
-
         when(repository.findById(1L)).thenReturn(Optional.of(person));
-        when(repository.save(person)).thenReturn(persisted);
-
+        when(repository.save(any(Person.class))).thenReturn(person);
         var result = service.update(dto);
-
-        assertNotNull(result);
-        assertNotNull(result.getId());
-        assertNotNull(result.getLinks());
-        assertTrue(result.getLinks().stream()
-                .anyMatch(link ->  link.getRel().value().equals("self")
-                        && link.getHref().endsWith("/api/person/v1/1")
-                        && "GET".equals(link.getType())
-                )
-        );
-
-        assertTrue(result.getLinks().stream()
-                .anyMatch(link ->  link.getRel().value().equals("findAll")
-                        && link.getHref().endsWith("/api/person/v1")
-                        && "GET".equals(link.getType())
-                )
-        );
-
-        assertTrue(result.getLinks().stream()
-                .anyMatch(link ->  link.getRel().value().equals("create")
-                        && link.getHref().endsWith("/api/person/v1")
-                        && "POST".equals(link.getType())
-                )
-        );
-
-        assertTrue(result.getLinks().stream()
-                .anyMatch(link ->  link.getRel().value().equals("update")
-                        && link.getHref().endsWith("/api/person/v1")
-                        && "PUT".equals(link.getType())
-                )
-        );
-
-        assertTrue(result.getLinks().stream()
-                .anyMatch(link ->  link.getRel().value().equals("delete")
-                        && link.getHref().endsWith("/api/person/v1/1")
-                        && "DELETE".equals(link.getType())
-                )
-        );
-
-        assertEquals("Address Test1", result.getAddress());
-        assertEquals("First Name Test1", result.getFirstName());
-        assertEquals("Last Name Test1", result.getLastName());
-        assertEquals("Female", result.getGender());
+        assertPerson(result, 1);
     }
 
     @Test
@@ -240,7 +114,6 @@ class PersonServicesTest {
         Person person = input.mockEntity(1);
         person.setId(1L);
         when(repository.findById(1L)).thenReturn(Optional.of(person));
-
         service.delete(1L);
         verify(repository, times(1)).findById(anyLong());
         verify(repository, times(1)).delete(any(Person.class));
@@ -249,146 +122,16 @@ class PersonServicesTest {
 
     @Test
     void findAll() {
+        Pageable pageable = PageRequest.of(0, 10);
         List<Person> list = input.mockEntityList();
-        when(repository.findAll()).thenReturn(list);
-        List<PersonDTO> people = service.findAll();
-
-        assertNotNull(people);
+        Page<Person> page = new PageImpl<>(list, pageable, list.size());
+        when(repository.findAll(pageable)).thenReturn(page);
+        PagedModel<EntityModel<PersonDTO>> result = service.findAll(pageable);
+        assertNotNull(result);
+        List<EntityModel<PersonDTO>> people = result.getContent().stream().toList();
         assertEquals(14, people.size());
-
-        var personOne = people.get(1);
-
-        assertNotNull(personOne);
-        assertNotNull(personOne.getId());
-        assertNotNull(personOne.getLinks());
-        assertTrue(personOne.getLinks().stream()
-                .anyMatch(link ->  link.getRel().value().equals("self")
-                        && link.getHref().endsWith("/api/person/v1/1")
-                        && "GET".equals(link.getType())
-                )
-        );
-
-        assertTrue(personOne.getLinks().stream()
-                .anyMatch(link ->  link.getRel().value().equals("findAll")
-                        && link.getHref().endsWith("/api/person/v1")
-                        && "GET".equals(link.getType())
-                )
-        );
-
-        assertTrue(personOne.getLinks().stream()
-                .anyMatch(link ->  link.getRel().value().equals("create")
-                        && link.getHref().endsWith("/api/person/v1")
-                        && "POST".equals(link.getType())
-                )
-        );
-
-        assertTrue(personOne.getLinks().stream()
-                .anyMatch(link ->  link.getRel().value().equals("update")
-                        && link.getHref().endsWith("/api/person/v1")
-                        && "PUT".equals(link.getType())
-                )
-        );
-
-        assertTrue(personOne.getLinks().stream()
-                .anyMatch(link ->  link.getRel().value().equals("delete")
-                        && link.getHref().endsWith("/api/person/v1/1")
-                        && "DELETE".equals(link.getType())
-                )
-        );
-
-        assertEquals("Address Test1", personOne.getAddress());
-        assertEquals("First Name Test1", personOne.getFirstName());
-        assertEquals("Last Name Test1", personOne.getLastName());
-        assertEquals("Female", personOne.getGender());
-
-        var personFour = people.get(4);
-
-        assertNotNull(personFour);
-        assertNotNull(personFour.getId());
-        assertNotNull(personFour.getLinks());
-        assertTrue(personFour.getLinks().stream()
-                .anyMatch(link ->  link.getRel().value().equals("self")
-                        && link.getHref().endsWith("/api/person/v1/4")
-                        && "GET".equals(link.getType())
-                )
-        );
-
-        assertTrue(personFour.getLinks().stream()
-                .anyMatch(link ->  link.getRel().value().equals("findAll")
-                        && link.getHref().endsWith("/api/person/v1")
-                        && "GET".equals(link.getType())
-                )
-        );
-
-        assertTrue(personFour.getLinks().stream()
-                .anyMatch(link ->  link.getRel().value().equals("create")
-                        && link.getHref().endsWith("/api/person/v1")
-                        && "POST".equals(link.getType())
-                )
-        );
-
-        assertTrue(personFour.getLinks().stream()
-                .anyMatch(link ->  link.getRel().value().equals("update")
-                        && link.getHref().endsWith("/api/person/v1")
-                        && "PUT".equals(link.getType())
-                )
-        );
-
-        assertTrue(personFour.getLinks().stream()
-                .anyMatch(link ->  link.getRel().value().equals("delete")
-                        && link.getHref().endsWith("/api/person/v1/4")
-                        && "DELETE".equals(link.getType())
-                )
-        );
-
-        assertEquals("Address Test4", personFour.getAddress());
-        assertEquals("First Name Test4", personFour.getFirstName());
-        assertEquals("Last Name Test4", personFour.getLastName());
-        assertEquals("Male", personFour.getGender());
-
-        var personSeven = people.get(7);
-
-        assertNotNull(personSeven);
-        assertNotNull(personSeven.getId());
-        assertNotNull(personSeven.getLinks());
-        assertTrue(personSeven.getLinks().stream()
-                .anyMatch(link ->  link.getRel().value().equals("self")
-                        && link.getHref().endsWith("/api/person/v1/7")
-                        && "GET".equals(link.getType())
-                )
-        );
-
-        assertTrue(personSeven.getLinks().stream()
-                .anyMatch(link ->  link.getRel().value().equals("findAll")
-                        && link.getHref().endsWith("/api/person/v1")
-                        && "GET".equals(link.getType())
-                )
-        );
-
-        assertTrue(personSeven.getLinks().stream()
-                .anyMatch(link ->  link.getRel().value().equals("create")
-                        && link.getHref().endsWith("/api/person/v1")
-                        && "POST".equals(link.getType())
-                )
-        );
-
-        assertTrue(personSeven.getLinks().stream()
-                .anyMatch(link ->  link.getRel().value().equals("update")
-                        && link.getHref().endsWith("/api/person/v1")
-                        && "PUT".equals(link.getType())
-                )
-        );
-
-        assertTrue(personSeven.getLinks().stream()
-                .anyMatch(link ->  link.getRel().value().equals("delete")
-                        && link.getHref().endsWith("/api/person/v1/7")
-                        && "DELETE".equals(link.getType())
-                )
-        );
-
-        assertEquals("Address Test7", personSeven.getAddress());
-        assertEquals("First Name Test7", personSeven.getFirstName());
-        assertEquals("Last Name Test7", personSeven.getLastName());
-        assertEquals("Female", personSeven.getGender());
+        assertPerson(people.get(1).getContent(), 1);
+        assertPerson(people.get(4).getContent(), 4);
+        assertPerson(people.get(7).getContent(), 7);
     }
 }

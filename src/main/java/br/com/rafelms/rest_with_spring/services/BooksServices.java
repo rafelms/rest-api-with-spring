@@ -1,8 +1,10 @@
 package br.com.rafelms.rest_with_spring.services;
 
 import br.com.rafelms.rest_with_spring.controllers.BooksController;
+import br.com.rafelms.rest_with_spring.controllers.PersonController;
 import br.com.rafelms.rest_with_spring.controllers.docs.BooksControllerDocs;
 import br.com.rafelms.rest_with_spring.data.dto.v1.BooksDTO;
+import br.com.rafelms.rest_with_spring.data.dto.v1.PersonDTO;
 import br.com.rafelms.rest_with_spring.exception.RequiredObjectIsNullException;
 import br.com.rafelms.rest_with_spring.exception.ResourceNotFoundException;
 import static br.com.rafelms.rest_with_spring.mapper.ObjectMapper.parseObject;
@@ -13,9 +15,16 @@ import br.com.rafelms.rest_with_spring.validations.BooksValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.Link;
+import org.springframework.hateoas.PagedModel;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import javax.swing.text.html.parser.Entity;
 import java.util.List;
 
 import static br.com.rafelms.rest_with_spring.mapper.ObjectMapper.parseListObjects;
@@ -23,7 +32,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @Service
-public class BooksServices implements BooksControllerDocs {
+public class BooksServices {
     private Logger logger = LoggerFactory.getLogger(BooksServices.class.getName());
 
     @Autowired
@@ -31,6 +40,10 @@ public class BooksServices implements BooksControllerDocs {
 
     @Autowired
     BooksValidator validator;
+
+    @Autowired
+    PagedResourcesAssembler<BooksDTO> assembler;
+
 
 
     public BooksDTO findById(Long id){
@@ -42,11 +55,25 @@ public class BooksServices implements BooksControllerDocs {
         return dto;
     }
 
-    public List<BooksDTO> findAll(){
+
+    public PagedModel<EntityModel<BooksDTO>> findAll(Pageable pageable){
         logger.info("Finding one Book!");
-        var books =  parseListObjects(repository.findAll(), BooksDTO.class);
-        books.forEach(BooksServices::addHateoasLinks);
-        return books;
+
+        var Books = repository.findAll(pageable);
+
+        var booksWithLinks = Books.map(books -> {
+            var dto = parseObject(books, BooksDTO.class);
+            addHateoasLinks(dto);
+            return dto;
+        });
+
+        Link findAllLink = WebMvcLinkBuilder.linkTo(
+                        WebMvcLinkBuilder.methodOn(BooksController.class)
+                                .findAll(pageable.getPageNumber(),
+                                        pageable.getPageSize(),
+                                        String.valueOf(pageable.getSort())))
+                .withSelfRel();
+        return assembler.toModel(booksWithLinks, findAllLink);
     }
 
 
@@ -109,7 +136,7 @@ public class BooksServices implements BooksControllerDocs {
                 .withType("DELETE"));
 
         dto.add(linkTo(methodOn(BooksController.class)
-                .findAll())
+                .findAll(1, 5, "asc"))
                 .withRel("findAll")
                 .withType("GET"));
 
