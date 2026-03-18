@@ -47,9 +47,10 @@ spring:
     baseline-on-migrate: true
 logging:
   level:
-    root: warn
-    br.com.rafelms: DEBUG
+    root: info
 spring.doc:
-  paths-to-match: /api/**/v1/**
+  paths-to-match:
+    - /api/**/v1/**
+    - /auth/**
   swagger-ui:
     use-root-path: true

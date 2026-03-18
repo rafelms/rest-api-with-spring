@@ -23,7 +23,7 @@ public class AuthService {
     @Autowired
     private UserRepository repository;
 
-    public ResponseEntity<TokenDTO> singIn(AccountCredentialsDTO credentials){
+    public ResponseEntity<TokenDTO> signIn(AccountCredentialsDTO credentials){
         authenticationManager.authenticate(
             new UsernamePasswordAuthenticationToken(
                     credentials.getUsername(),
@@ -41,6 +41,17 @@ public class AuthService {
                 user.getRoles()
         );
 
+        return ResponseEntity.ok(token);
+    }
+
+    public ResponseEntity<TokenDTO> refreshToken(String username, String refreshToken){
+        var user = repository.findByUsername(username);
+        TokenDTO token;
+
+        if (user == null) {
+            throw new UsernameNotFoundException("Username " + username + " not found!");
+        }
+        token = tokenProvider.refreshToken(refreshToken);
         return ResponseEntity.ok(token);
     }
 }

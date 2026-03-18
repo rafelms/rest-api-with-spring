@@ -1,9 +1,9 @@
 package br.com.rafelms.rest_with_spring.data.dto.security;
 
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import lombok.*;
 
 import java.io.Serializable;
 
@@ -13,13 +13,15 @@ import java.io.Serializable;
 @Setter
 @EqualsAndHashCode
 @AllArgsConstructor
+@ToString
+@Valid
 public class AccountCredentialsDTO implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    @NotBlank(message = "Username cannot be null")
     private String username;
-    private String password;
 
-    public AccountCredentialsDTO() {
-    }
+    @NotNull(message = "Password cannot be null")
+    private String password;
 }
