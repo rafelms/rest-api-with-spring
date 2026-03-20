@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  # Banco de Dados
+  db:
+    image: mysql:8.4
+    #command: --default-authentication-plugin=mysql_native_password
+    container_name: mysql_db
+    restart: always
+    environment:
+      TZ: America/Sao_Paulo
+      MYSQL_ROOT_PASSWORD: 123456
+      MYSQL_USER: docker
+      MYSQL_PASSWORD: 123456
+      MYSQL_DATABASE: rest_with_spring
+    ports:
+      - "3308:3306"
+    networks:
+      - rafael-network
+    volumes:
+      - mysql_data:/var/lib/mysql # Salva os dados para não perder se o container cair
+
+  # Aplicação Spring Boot
+  rest-with-spring:
+    image: rafaelmsdc/rest-with-spring
+    container_name: spring_app
+    restart: always
+    build:
+      context: . # Usa o Dockerfile que está na mesma pasta
+    environment:
+      TZ: America/Sao_Paulo
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/rest_with_spring?useTimezone=true&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: 123456
+    depends_on:
+      - db
+    ports:
+      - "80:8080"
+    networks:
+      - rafael-network
+
+networks:
+  rafael-network:
+    driver: bridge
+
+volumes:
+  mysql_data: # Define o volume do banco de dados
