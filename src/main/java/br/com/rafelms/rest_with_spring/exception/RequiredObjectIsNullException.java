@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 public class RequiredObjectIsNullException extends RuntimeException {
     public RequiredObjectIsNullException() {
 
-        super("It is not allowed to persist a null object!");
+        super("Não é permitido cadastrar um usuário nulo!");
     }
 
     public RequiredObjectIsNullException(String message) {

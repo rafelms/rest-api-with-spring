@@ -1,7 +1,7 @@
 cors:
   originPatterns: http://localhost:8080,http://localhost:3000,https://rafaelms.com.br
 file:
-  upload-dir: /Users\05606928116\Desktop\UploadDir
+  upload-dir: /Users\Rafael\Desktop\UploadDir
 security:
   jwt:
     token:
@@ -18,7 +18,7 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/rest-with-spring?createDatabaseIfNotExist=true&useTimezone=true&serverTimezone=UTC
     username: root
-    password: 123456
+    password: novasenha
   jpa:
     hibernate:
       ddl-auto: validate

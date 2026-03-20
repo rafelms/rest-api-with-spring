@@ -24,4 +24,7 @@ public class AccountCredentialsDTO implements Serializable {
 
     @NotNull(message = "Password cannot be null")
     private String password;
+
+    @NotNull(message = "Fullname cannot be null")
+    private String fullname;
 }
